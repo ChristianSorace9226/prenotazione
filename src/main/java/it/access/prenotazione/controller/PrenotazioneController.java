@@ -1,5 +1,6 @@
 package it.access.prenotazione.controller;
 
+import it.access.prenotazione.config.AppValue;
 import it.access.prenotazione.dto.PrenotazioneDTO;
 import it.access.prenotazione.service.resource.PrenotazioneServiceResource;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @AllArgsConstructor
 public class PrenotazioneController {
 
+    private final AppValue appValue;
     private final RestTemplate restTemplate;
     private final PrenotazioneServiceResource prenotazioneServiceResource;
 
@@ -21,11 +23,10 @@ public class PrenotazioneController {
     public ResponseEntity<String> creaPrenotazione(@RequestBody PrenotazioneDTO request,
                                                    @RequestHeader("Authorization") String token) {
         // Verifica del token di autenticazione
-        String authServiceUrl = "http://localhost:8080/api/token/validate";
         Boolean isValid;
 
         try {
-            isValid = restTemplate.getForObject(authServiceUrl + "?token=" + token, Boolean.class);
+            isValid = restTemplate.getForObject(appValue.getExternalServiceUrl(), Boolean.class, token);
         } catch (RestClientException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nella comunicazione con il servizio di autenticazione");
         }
