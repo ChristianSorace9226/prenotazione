@@ -24,8 +24,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
 
     @Override
     public String prenota(PrenotazioneDTO request) {
-        Prenotazione nuovaPrenotazione = prenotazioneMapper.toEntity(request);
-        prenotazioneRepository.save(nuovaPrenotazione);
+        Prenotazione nuovaPrenotazione = prenotazioneRepository.save(prenotazioneMapper.toEntity(request));
         return "Prenotazione avvenuta con successo con codice: " + nuovaPrenotazione.getCodice();
     }
 }
