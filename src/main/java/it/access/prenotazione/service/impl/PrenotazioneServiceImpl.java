@@ -38,8 +38,8 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
     public PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione) {
         Prenotazione prenotazioneEntity = prenotazioneRepository.findByCodice(codice)
                 .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto"));
-        prenotazioneEntity.setVersion(prenotazione.getVersion());
         prenotazioneEntity.setUpdatedAt(LocalDateTime.now());
+        prenotazioneEntity.setCodice(prenotazione.getCodice());
         prenotazioneRepository.save(prenotazioneEntity);
         return prenotazioneMapper.toDto(prenotazioneEntity);
     }
