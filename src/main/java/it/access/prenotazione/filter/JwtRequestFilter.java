@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,19 +39,27 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // Verifica del token di autenticazione
             Boolean isValid;
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", authorizationHeader);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<Boolean> responseValid = restTemplate.exchange(
-                    appValue.getExternalServiceUrl(),  // URL del microservizio di validazione JWT
-                    HttpMethod.GET,                    // Metodo GET per la validazione del token
-                    entity,                            // Passa l'header con il token
-                    Boolean.class                      // Il tipo di risposta atteso (es: true o false)
-            );
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("Authorization", authorizationHeader);
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+                ResponseEntity<Boolean> responseValid = restTemplate.exchange(
+                        appValue.getHasAccessUrl(),  // URL del microservizio di validazione JWT
+                        HttpMethod.GET,                    // Metodo GET per la validazione del token
+                        entity,                            // Passa l'header con il token
+                        Boolean.class                      // Il tipo di risposta atteso (es: true o false)
+                );
 
-            isValid = responseValid.getBody();  // Verifica se il token è valido
-            if (Boolean.TRUE.equals(isValid)) {
-                chain.doFilter(request, response);
+                isValid = responseValid.getBody();  // Verifica se il token è valido
+                if (Boolean.TRUE.equals(isValid)) {
+                    chain.doFilter(request, response);
+                }
+            } catch (RestClientException e) {
+                throw new RuntimeException("Errore di comunicazione: " + e);
+            } catch (IOException e) {
+                throw new RuntimeException("Errore interno: " + e);
+            } catch (ServletException e) {
+                throw new RuntimeException("Errore servlet: " + e);
             }
         }
     }

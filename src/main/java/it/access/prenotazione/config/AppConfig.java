@@ -30,7 +30,8 @@ public class AppConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/prenotazione/richiesta").permitAll();
+                    auth.requestMatchers("/prenotazione/richiesta","/prenotazione/update/*",
+                            "/prenotazione/cancella/*","/prenotazione/prenotazioni/*", "/prenotazione/prenotazioni/get-all").permitAll();
                     auth.anyRequest().authenticated();
                 });
 

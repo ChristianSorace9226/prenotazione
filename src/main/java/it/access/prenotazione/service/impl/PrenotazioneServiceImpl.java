@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @Getter
 @Setter
@@ -24,7 +27,42 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
 
     @Override
     public String prenota(PrenotazioneDTO request) {
-        Prenotazione nuovaPrenotazione = prenotazioneRepository.save(prenotazioneMapper.toEntity(request));
-        return "Prenotazione avvenuta con successo con codice: " + nuovaPrenotazione.getCodice();
+        if (prenotazioneRepository.findByCodice(request.getCodice()).isEmpty()) {
+            Prenotazione nuovaPrenotazione = prenotazioneRepository.save(prenotazioneMapper.toEntity(request));
+            return "Prenotazione avvenuta con successo con codice: " + nuovaPrenotazione.getCodice();
+        }
+        return "Prenotazione non possibile: codice già in uso.";
+    }
+
+    @Override
+    public PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione) {
+        Prenotazione prenotazioneEntity = prenotazioneRepository.findByCodice(codice)
+                .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto"));
+        prenotazioneEntity.setVersion(prenotazione.getVersion());
+        prenotazioneEntity.setUpdatedAt(LocalDateTime.now());
+        prenotazioneRepository.save(prenotazioneEntity);
+        return prenotazioneMapper.toDto(prenotazioneEntity);
+    }
+
+    @Override
+    public PrenotazioneDTO getPrenotazione(String codice) {
+        Prenotazione prenotazione = prenotazioneRepository.findByCodice(codice)
+                .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto"));
+        return prenotazioneMapper.toDto(prenotazione);
+    }
+
+    @Override
+    public String cancellaPrenotazione(String codice) {
+        if (prenotazioneRepository.findByCodice(codice).isPresent()) {
+            prenotazioneRepository.deleteByCodice(codice);
+            return "Prenotazione cancellata correttamente.";
+        }
+        return "Codice non trovato o non corretto.";
+    }
+
+    @Override
+    public List<PrenotazioneDTO> getAllPrenotazioni() {
+        List<Prenotazione> prenotazioni = prenotazioneRepository.findAll();
+        return prenotazioneMapper.toDtoList(prenotazioni);
     }
 }

@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 public class AppValue {
 
     @Value("${external.service.url}")
-    private String externalServiceUrl;
+    private String hasAccessUrl;
 
 }

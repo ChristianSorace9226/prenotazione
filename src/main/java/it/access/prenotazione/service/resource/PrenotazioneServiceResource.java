@@ -2,8 +2,17 @@ package it.access.prenotazione.service.resource;
 
 import it.access.prenotazione.dto.PrenotazioneDTO;
 
+import java.util.List;
+
 public interface PrenotazioneServiceResource {
 
-    public String prenota(PrenotazioneDTO request);
+    String prenota(PrenotazioneDTO request);
 
+    PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione);
+
+    PrenotazioneDTO getPrenotazione(String codice);
+
+    String cancellaPrenotazione(String codice);
+
+    List<PrenotazioneDTO> getAllPrenotazioni();
 }

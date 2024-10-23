@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PrenotazioneRepository extends JpaRepository<Prenotazione,Long> {
     Optional<Prenotazione> findByCodice(String codice);
+    void deleteByCodice(String codice);
 }
