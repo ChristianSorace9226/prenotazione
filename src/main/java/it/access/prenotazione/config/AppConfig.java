@@ -28,13 +28,7 @@ public class AppConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/prenotazione/richiesta","/prenotazione/update/*",
-                            "/prenotazione/cancella/*","/prenotazione/prenotazioni/*", "/prenotazione/prenotazioni/get-all").permitAll();
-                    auth.anyRequest().authenticated();
-                });
-
+        http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

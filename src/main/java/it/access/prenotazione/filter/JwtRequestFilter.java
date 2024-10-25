@@ -47,7 +47,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         appValue.getHasAccessUrl(),  // URL del microservizio di validazione JWT
                         HttpMethod.GET,                    // Metodo GET per la validazione del token
                         entity,                            // Passa l'header con il token
-                        Boolean.class                      // Il tipo di risposta atteso (es: true o false)
+                        Boolean.class,                      // Il tipo di risposta atteso (es: true o false)
+                        request.getRequestURI()
                 );
 
                 isValid = responseValid.getBody();  // Verifica se il token è valido
