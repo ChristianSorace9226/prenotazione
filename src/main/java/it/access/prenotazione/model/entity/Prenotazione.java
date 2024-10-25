@@ -20,29 +20,33 @@ public class Prenotazione {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @LastModifiedDate
     @Column(name = "data_modifica_record")
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @CreatedDate
     @Column(name = "data_inserimento_record")
-    LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Version
     @Column(name = "optlck")
-    Long version;
+    private Long version;
 
     @Column(name = "codice")
-    String codice;
+    private String codice;
 
-//	@Column(name = "flag_prenotato")
-//	boolean prenotato;
-//
-//	@Column(name = "flag_vidimato")
-//	boolean vidimato;
-//
+	@Column(name = "flag_prenotato")
+    private boolean prenotato;
+
+	@Column(name = "flag_vidimato")
+    private boolean vidimato;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+
 //	@ManyToOne(fetch = FetchType.EAGER)
 //	@JoinColumn(name = "id_posto")
 //	Posto posto;
@@ -50,11 +54,7 @@ public class Prenotazione {
 //	@ManyToOne(fetch = FetchType.EAGER)
 //	@JoinColumn(name = "id_planning")
 //	Planning planning;
-//
-//	@ManyToOne(fetch = FetchType.EAGER)
-//	@JoinColumn(name = "id_dip_cliente")
-//	DipCliente dipCliente;
-//
+
 //	@ManyToOne(fetch = FetchType.EAGER)
 //	@JoinColumn(name = "id_fermata_salita")
 //	FermataDirettriceCorsa fermataSalita;
