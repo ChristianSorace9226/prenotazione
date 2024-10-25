@@ -11,10 +11,8 @@ import java.time.LocalDateTime;
 @ToString
 public class PrenotazioneDTO {
 
-    Long id;
-    LocalDateTime updatedAt;
-    LocalDateTime createdAt = LocalDateTime.now();
-    Long version;
-    String codice;
+    private Long id;
+    private String codice;
+    private Long userId;
 
 }

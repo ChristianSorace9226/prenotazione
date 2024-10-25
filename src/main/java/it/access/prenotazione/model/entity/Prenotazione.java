@@ -43,7 +43,7 @@ public class Prenotazione {
 	@Column(name = "flag_vidimato")
     private boolean vidimato;
 
-    @Column(name = "user_id")
+    @Column
     private Long userId;
 
 
