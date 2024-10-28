@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface PrenotazioneServiceResource {
 
-    String prenota(PrenotazioneDTO request);
+    String prenota(PrenotazioneDTO request, String token);
 
     PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione);
 

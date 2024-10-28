@@ -11,4 +11,11 @@ public class AppValue {
     @Value("${external.service.url}")
     private String hasAccessUrl;
 
+    @Value("${get.userId.from.jwt}")
+    private String getUserId;
+
+    @Value("${get.saved.codicePrenotazione.in.user}")
+    private String saveCodPrenotazioneIntoUser;
+
+
 }
