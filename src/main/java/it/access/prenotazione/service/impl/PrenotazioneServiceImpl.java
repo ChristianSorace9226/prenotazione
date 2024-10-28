@@ -8,6 +8,7 @@ import it.access.prenotazione.service.resource.PrenotazioneServiceResource;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
         this.prenotazioneRepository = prenotazioneRepository;
     }
 
+    @Transactional
     @Override
     public String prenota(PrenotazioneDTO request) {
         if (prenotazioneRepository.findByCodice(request.getCodice()).isEmpty()) {
@@ -34,6 +36,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
         return "Prenotazione non possibile: codice già in uso.";
     }
 
+    @Transactional
     @Override
     public PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione) {
         Prenotazione prenotazioneEntity = prenotazioneRepository.findByCodice(codice)
@@ -53,6 +56,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
         return prenotazioneMapper.toDto(prenotazione);
     }
 
+    @Transactional
     @Override
     public String cancellaPrenotazione(String codice) {
         if (prenotazioneRepository.findByCodice(codice).isPresent()) {

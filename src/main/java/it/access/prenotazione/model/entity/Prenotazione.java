@@ -30,7 +30,7 @@ public class Prenotazione {
     @Column(name = "data_inserimento_record")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Version
+//    @Version
     @Column(name = "optlck")
     private Long version;
 
