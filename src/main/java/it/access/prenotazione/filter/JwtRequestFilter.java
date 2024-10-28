@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -43,12 +44,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Authorization", authorizationHeader);
                 HttpEntity<String> entity = new HttpEntity<>(headers);
+
+                // Passa request.getRequestURI() come variabile di percorso
+                // Costruzione dell'URL usando UriComponentsBuilder
+                String validationUrl = UriComponentsBuilder
+                        .fromHttpUrl(appValue.getHasAccessUrl()) // Base URL che include già /jwt/has-access
+                        .queryParam("uri", request.getRequestURI())
+                        .toUriString(); // Converte in String
+
                 ResponseEntity<Boolean> responseValid = restTemplate.exchange(
-                        appValue.getHasAccessUrl(),  // URL del microservizio di validazione JWT
-                        HttpMethod.GET,                    // Metodo GET per la validazione del token
-                        entity,                            // Passa l'header con il token
-                        Boolean.class,                      // Il tipo di risposta atteso (es: true o false)
-                        request.getRequestURI()
+                        validationUrl,
+                        HttpMethod.GET,
+                        entity,
+                        Boolean.class
                 );
 
                 isValid = responseValid.getBody();  // Verifica se il token è valido
