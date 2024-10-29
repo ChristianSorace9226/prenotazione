@@ -1,5 +1,6 @@
 package it.access.prenotazione.util;
 
+import it.access.prenotazione.config.AppValue;
 import it.access.prenotazione.dto.PrenotazioneDTO;
 import it.access.prenotazione.mapper.PrenotazioneMapper;
 import it.access.prenotazione.model.entity.Prenotazione;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,14 +18,18 @@ import java.util.UUID;
 @Setter
 @Getter
 @Slf4j
-public class PrenotazioneUtil extends BaseUtil {
+public class PrenotazioneUtil {
 
     private final PrenotazioneRepository prenotazioneRepository;
     private final PrenotazioneMapper prenotazioneMapper;
+    private final AppValue appValue;
+    private final RestTemplate restTemplate;
 
-    public PrenotazioneUtil(PrenotazioneRepository prenotazioneRepository, PrenotazioneMapper prenotazioneMapper) {
+    public PrenotazioneUtil(PrenotazioneRepository prenotazioneRepository, PrenotazioneMapper prenotazioneMapper, AppValue appValue, RestTemplate restTemplate) {
         this.prenotazioneRepository = prenotazioneRepository;
         this.prenotazioneMapper = prenotazioneMapper;
+        this.appValue = appValue;
+        this.restTemplate = restTemplate;
     }
 
     public String createPrenotazione(PrenotazioneDTO request, String token) {
