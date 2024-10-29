@@ -25,23 +25,15 @@ public class AppConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
 
-    public AppConfig(@Lazy JwtRequestFilter jwtRequestFilter) {
+    public AppConfig(JwtRequestFilter jwtRequestFilter) {
         this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http.csrf(AbstractHttpConfigurer::disable);
-
         // Aggiungi il filtro JWT prima del filtro di autenticazione
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
