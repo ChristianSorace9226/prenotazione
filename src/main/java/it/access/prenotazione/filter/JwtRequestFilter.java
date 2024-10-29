@@ -1,6 +1,7 @@
 package it.access.prenotazione.filter;
 
 import it.access.prenotazione.config.AppValue;
+import it.access.prenotazione.util.BaseUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
