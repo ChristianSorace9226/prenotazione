@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Servizio per l'applicazione prenotazione
+  app:
+    build: .
+    ports:
+      - "8081:8081"   # Espone le porte
+    depends_on:
+      - mysql         # Attende che MySQL sia disponibile prima di avviare l'app
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker   # Imposta il profilo 'docker'
+      - EXTERNAL_SERVICE_URL=http://host.docker.internal:8080/jwt/has-access  # URL del servizio esterno
+      - GET_USER_ID_URL=http://host.docker.internal:8080/jwt/get-username-from-jwt-token/
+      - SAVE_COD_PRONTO_URL=http://host.docker.internal:8080/utente/users/save-prenotazione
+    networks:
+      - prenotazione-network
+
+  # Servizio MySQL
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3307:3306"   # Esponi MySQL sulla porta 3307
+    environment:
+      MYSQL_ROOT_PASSWORD: rootroot
+      MYSQL_DATABASE: prenotazione
+    networks:
+      - prenotazione-network
+
+# Definisci una rete personalizzata per far comunicare i container
+networks:
+  prenotazione-network:
+    driver: bridge
