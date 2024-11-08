@@ -2,6 +2,7 @@ package it.access.prenotazione.util;
 
 import it.access.prenotazione.config.AppValue;
 import it.access.prenotazione.dto.PrenotazioneDTO;
+import it.access.prenotazione.exception.InvalidTokenException;
 import it.access.prenotazione.mapper.PrenotazioneMapper;
 import it.access.prenotazione.model.entity.Prenotazione;
 import it.access.prenotazione.model.repository.PrenotazioneRepository;
@@ -39,7 +40,7 @@ public class PrenotazioneUtil {
             Long userId = restTemplate.getForObject(appValue.getGetUserId() + token, Long.class);
             if (userId == null){
                 log.error("UserId non trovato per il token: {}", token);
-                return null;
+                throw new InvalidTokenException("Token non valido");
             }
             nuovaPrenotazione.setUserId(userId);
             nuovaPrenotazione.setPrenotato(true);
