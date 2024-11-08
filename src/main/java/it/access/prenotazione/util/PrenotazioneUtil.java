@@ -37,6 +37,10 @@ public class PrenotazioneUtil {
             Prenotazione nuovaPrenotazione = prenotazioneMapper.toEntity(request);
             token = token.substring(7);
             Long userId = restTemplate.getForObject(appValue.getGetUserId() + token, Long.class);
+            if (userId == null){
+                log.error("UserId non trovato per il token: {}", token);
+                return null;
+            }
             nuovaPrenotazione.setUserId(userId);
             nuovaPrenotazione.setPrenotato(true);
             nuovaPrenotazione.setCreatedAt(LocalDateTime.now());
