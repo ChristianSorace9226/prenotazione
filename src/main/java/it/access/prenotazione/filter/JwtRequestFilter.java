@@ -1,5 +1,6 @@
 package it.access.prenotazione.filter;
 
+import it.access.prenotazione.exception.InvalidTokenException;
 import it.access.prenotazione.service.resource.TokenValidationResource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 
 @Component
 @AllArgsConstructor
@@ -28,14 +30,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            Boolean isValid = tokenValidationResource.isValidToken(authorizationHeader, request.getRequestURI());
-            if (Boolean.TRUE.equals(isValid)) {
-                chain.doFilter(request, response);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token non valido");
+            try {
+                Boolean isValid = tokenValidationResource.isValidToken(authorizationHeader, request.getRequestURI());
+                if (Boolean.TRUE.equals(isValid)) {
+                    chain.doFilter(request, response);
+                }
+            } catch (RuntimeException e) {
+                throw new InvalidTokenException(e.getMessage());
+//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token non valido");
             }
-        } else {
-            chain.doFilter(request, response);
         }
     }
 }
