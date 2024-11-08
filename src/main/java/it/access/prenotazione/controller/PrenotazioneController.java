@@ -24,7 +24,7 @@ public class PrenotazioneController {
             String response = prenotazioneServiceResource.prenota(request, token);
             return ResponseEntity.ok(response);
         } catch (InvalidTokenException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Il token non è valido(controller)");
         }
     }
 
