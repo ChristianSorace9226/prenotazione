@@ -41,7 +41,7 @@ public class TokenValidationService implements TokenValidationResource {
 
             return responseValid.getBody();
         } catch (RestClientException e) {
-            throw new RuntimeException("Errore di comunicazione: " + e);
+            throw new RuntimeException("Errore di comunicazione = " + e.getMessage());
         }
     }
 }
