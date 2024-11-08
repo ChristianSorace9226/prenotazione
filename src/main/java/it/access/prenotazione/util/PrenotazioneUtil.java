@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -37,8 +38,10 @@ public class PrenotazioneUtil {
         if (prenotazioneRepository.findByCodice(request.getCodice()).isEmpty()) {
             Prenotazione nuovaPrenotazione = prenotazioneMapper.toEntity(request);
             token = token.substring(7);
-            Long userId = restTemplate.getForObject(appValue.getGetUserId() + token, Long.class);
-            if (userId == null){
+            Long userId = null;
+            try {
+                userId = restTemplate.getForObject(appValue.getGetUserId() + token, Long.class);
+            } catch (RestClientException e) {
                 log.error("UserId non trovato per il token: {}", token);
                 throw new InvalidTokenException("Token non valido");
             }
