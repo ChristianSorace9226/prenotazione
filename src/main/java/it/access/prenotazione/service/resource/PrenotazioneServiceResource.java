@@ -1,12 +1,13 @@
 package it.access.prenotazione.service.resource;
 
 import it.access.prenotazione.dto.PrenotazioneDTO;
+import jakarta.servlet.ServletException;
 
 import java.util.List;
 
 public interface PrenotazioneServiceResource {
 
-    String prenota(PrenotazioneDTO request, String token);
+    String prenota(PrenotazioneDTO request, String token) throws ServletException;
 
     PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione);
 

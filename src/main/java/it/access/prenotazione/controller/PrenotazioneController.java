@@ -3,6 +3,7 @@ package it.access.prenotazione.controller;
 import it.access.prenotazione.dto.PrenotazioneDTO;
 import it.access.prenotazione.exception.InvalidTokenException;
 import it.access.prenotazione.service.resource.PrenotazioneServiceResource;
+import jakarta.servlet.ServletException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,12 @@ public class PrenotazioneController {
 
     @PostMapping("/prenota")
     public ResponseEntity<String> creaPrenotazione(@RequestHeader("Authorization") String token,
-                                                   @RequestBody PrenotazioneDTO request) {
+                                                   @RequestBody PrenotazioneDTO request){
         try {
             String response = prenotazioneServiceResource.prenota(request, token);
             return ResponseEntity.ok(response);
-        } catch (InvalidTokenException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (ServletException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token non valido (prenotazioneMs)");
         }
     }
 

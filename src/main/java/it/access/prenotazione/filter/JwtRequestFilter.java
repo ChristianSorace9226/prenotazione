@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -28,14 +29,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            Boolean isValid = tokenValidationResource.isValidToken(authorizationHeader, request.getRequestURI());
+            Boolean isValid = null;
+            try {
+                isValid = tokenValidationResource.isValidToken(authorizationHeader, request.getRequestURI());
+            } catch (RuntimeException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token non valido");
+//                return;
+            }
             if (Boolean.TRUE.equals(isValid)) {
                 chain.doFilter(request, response);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token non valido");
             }
-        } else {
-            chain.doFilter(request, response);
         }
     }
 }
