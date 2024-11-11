@@ -11,7 +11,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker   # Imposta il profilo 'docker'
       - EXTERNAL_SERVICE_URL=http://host.docker.internal:8080/jwt/has-access  # URL del servizio esterno
-      - GET_USER_ID_URL=http://host.docker.internal:8080/jwt/get-username-from-jwt-token/
+      - GET_USER_ID_URL=http://host.docker.internal:8080/jwt/get-userid-from-jwt-token/
       - SAVE_COD_PRONTO_URL=http://host.docker.internal:8080/utente/users/save-prenotazione
     networks:
       - prenotazione-network
