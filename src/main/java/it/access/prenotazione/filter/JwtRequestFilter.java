@@ -1,5 +1,6 @@
 package it.access.prenotazione.filter;
 
+import it.access.prenotazione.response.CustomResponse;
 import it.access.prenotazione.service.resource.TokenValidationResource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,15 +30,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
-                Boolean isValid = tokenValidationResource.isValidToken(authorizationHeader, request.getRequestURI());
+                CustomResponse<Boolean> isValidCall = tokenValidationResource.isValidToken(authorizationHeader, request.getRequestURI());
+
+                int isValidResult = isValidCall.getResult();
+                Boolean isValid = isValidCall.getResponse();
+                String isValidError = isValidCall.getErrorMessage();
+
                 if (Boolean.TRUE.equals(isValid)) {
                     chain.doFilter(request, response);
+                } else {
+                    response.setStatus(isValidResult);
+                    response.getWriter().write(isValidError);
                 }
+
             } catch (RuntimeException e) {
-                String[] messaggio = e.getMessage().substring(26).split(" : ");
-                messaggio[1] = messaggio[1].substring(1, messaggio[1].length() - 1);
-                response.setStatus(Integer.parseInt(messaggio[0]));
-                response.getWriter().write(messaggio[1]);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write(e.getMessage());
             }
         }
     }

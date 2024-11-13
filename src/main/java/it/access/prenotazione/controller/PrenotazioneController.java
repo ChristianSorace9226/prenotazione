@@ -2,6 +2,7 @@ package it.access.prenotazione.controller;
 
 import it.access.prenotazione.dto.PrenotazioneDTO;
 import it.access.prenotazione.exception.InvalidTokenException;
+import it.access.prenotazione.response.CustomResponse;
 import it.access.prenotazione.service.resource.PrenotazioneServiceResource;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,42 +19,59 @@ public class PrenotazioneController {
     private final PrenotazioneServiceResource prenotazioneServiceResource;
 
     @PostMapping("/prenota")
-    public ResponseEntity<String> creaPrenotazione(@RequestHeader("Authorization") String token,
-                                                   @RequestBody PrenotazioneDTO request) {
+    public ResponseEntity<CustomResponse<String>> creaPrenotazione(@RequestHeader("Authorization") String token,
+                                                                           @RequestBody PrenotazioneDTO request) {
         try {
             String response = prenotazioneServiceResource.prenota(request, token);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(CustomResponse.success(response));
         } catch (InvalidTokenException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Il token non è valido(controller)");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CustomResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
     @PutMapping("/update/{codice}")
-    public ResponseEntity<PrenotazioneDTO> modificaPrenotazione(@RequestHeader("Authorization") String token,
+    public ResponseEntity<CustomResponse<PrenotazioneDTO>> modificaPrenotazione(@RequestHeader("Authorization") String token,
                                                                 @PathVariable String codice,
                                                                 @RequestBody PrenotazioneDTO prenotazione) {
-        PrenotazioneDTO updatedPrenotazione = prenotazioneServiceResource.modificaPrenotazione(codice, prenotazione);
-        return ResponseEntity.ok(updatedPrenotazione);
+        try {
+            return ResponseEntity.ok(CustomResponse.success(prenotazioneServiceResource.modificaPrenotazione(codice, prenotazione)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(CustomResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        }
     }
 
     @GetMapping("/prenotazioni/{codice}")
-    public ResponseEntity<PrenotazioneDTO> getPrenotazioneByCodice(@RequestHeader("Authorization") String token,
+    public ResponseEntity<CustomResponse<PrenotazioneDTO>> getPrenotazioneByCodice(@RequestHeader("Authorization") String token,
                                                                    @PathVariable String codice) {
-        PrenotazioneDTO prenotazione = prenotazioneServiceResource.getPrenotazione(codice);
-        return ResponseEntity.ok(prenotazione);
+        try {
+            return ResponseEntity.ok(CustomResponse.success(prenotazioneServiceResource.getPrenotazione(codice)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(CustomResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        }
     }
 
     @DeleteMapping("/cancella/{codice}")
-    public ResponseEntity<String> cancellaPrenotazione(@RequestHeader("Authorization") String token,
+    public ResponseEntity<CustomResponse<String>> cancellaPrenotazione(@RequestHeader("Authorization") String token,
                                                        @PathVariable String codice) {
-        String response = prenotazioneServiceResource.cancellaPrenotazione(codice);
-        return ResponseEntity.ok(response);
+        try {
+            return ResponseEntity.ok(CustomResponse.success(prenotazioneServiceResource.cancellaPrenotazione(codice)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(CustomResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        }
     }
 
     @GetMapping("/prenotazioni/get-all")
-    public ResponseEntity<List<PrenotazioneDTO>> getAllPrenotazioni(@RequestHeader("Authorization") String token) {
-        List<PrenotazioneDTO> prenotazioni = prenotazioneServiceResource.getAllPrenotazioni();
-        return ResponseEntity.ok(prenotazioni);
+    public ResponseEntity<CustomResponse<List<PrenotazioneDTO>>> getAllPrenotazioni(@RequestHeader("Authorization") String token) {
+        try {
+            return ResponseEntity.ok(CustomResponse.success(prenotazioneServiceResource.getAllPrenotazioni()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(CustomResponse.error(HttpStatus.NO_CONTENT.value(), e.getMessage()));
+        }
     }
 
 }

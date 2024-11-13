@@ -1,6 +1,7 @@
 package it.access.prenotazione.service.impl;
 
 import it.access.prenotazione.config.AppValue;
+import it.access.prenotazione.response.CustomResponse;
 import it.access.prenotazione.service.resource.TokenValidationResource;
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class TokenValidationService implements TokenValidationResource {
     private final RestTemplate restTemplate;
 
     @Override
-    public Boolean isValidToken(@Nonnull String authorizationHeader, @Nonnull String requestURI) {
+    public CustomResponse<Boolean> isValidToken(@Nonnull String authorizationHeader, @Nonnull String requestURI) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", authorizationHeader);
@@ -39,7 +40,7 @@ public class TokenValidationService implements TokenValidationResource {
                     Boolean.class
             );
 
-            return responseValid.getBody();
+            return CustomResponse.success(responseValid.getBody());
         } catch (RestClientException e) {
             throw new RuntimeException("Errore di comunicazione = " + e.getMessage());
         }

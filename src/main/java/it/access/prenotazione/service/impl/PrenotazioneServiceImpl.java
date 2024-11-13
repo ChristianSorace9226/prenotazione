@@ -44,7 +44,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
             Prenotazione nuovaPrenotazione = prenotazioneRepository.findByCodice(codicePrenotazione)
                     .orElseThrow(() -> new RuntimeException("Prenotazione non riuscita"));
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(appValue.getSaveCodPrenotazioneIntoUser())
-                    .queryParam("userId",  nuovaPrenotazione.getUserId())
+                    .queryParam("userId", nuovaPrenotazione.getUserId())
                     .queryParam("codice", codicePrenotazione);
             Boolean codeSaved = restTemplate.getForObject(builder.toUriString(), Boolean.class);
 
@@ -81,16 +81,18 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
     @Transactional
     @Override
     public String cancellaPrenotazione(String codice) {
-        if (prenotazioneRepository.findByCodice(codice).isPresent()) {
-            prenotazioneRepository.deleteByCodice(codice);
-            return "Prenotazione cancellata correttamente.";
-        }
-        return "Codice non trovato o non corretto.";
+        Prenotazione prenotzione = prenotazioneRepository.findByCodice(codice)
+                .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto."));
+        prenotazioneRepository.deleteByCodice(codice);
+        return "Prenotazione cancellata correttamente.";
     }
 
     @Override
     public List<PrenotazioneDTO> getAllPrenotazioni() {
         List<Prenotazione> prenotazioni = prenotazioneRepository.findAll();
+        if (prenotazioni.isEmpty()){
+            throw new RuntimeException("Nessuna prenotazione trovata.");
+        }
         return prenotazioneMapper.toDtoList(prenotazioni);
     }
 }
