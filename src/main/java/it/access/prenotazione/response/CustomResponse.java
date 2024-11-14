@@ -1,6 +1,5 @@
 package it.access.prenotazione.response;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +14,16 @@ public class CustomResponse <T>{
         this.result = result;
         this.response = response;
         this.errorMessage = errorMessage;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CustomResponse{");
+        sb.append("errorMessage='").append(errorMessage).append('\'');
+        sb.append(", result=").append(result);
+        sb.append(", response=").append(response);
+        sb.append('}');
+        return sb.toString();
     }
 
     public static <T> CustomResponse<T> success(T response) {

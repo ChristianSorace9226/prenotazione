@@ -5,10 +5,8 @@ import it.access.prenotazione.response.CustomResponse;
 import it.access.prenotazione.service.resource.TokenValidationResource;
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -33,16 +31,17 @@ public class TokenValidationService implements TokenValidationResource {
                     .queryParam("uri", requestURI)
                     .toUriString();
 
-            ResponseEntity<Boolean> responseValid = restTemplate.exchange(
+            ResponseEntity<CustomResponse<Boolean>> responseValid = restTemplate.exchange(
                     validationUrl,
                     HttpMethod.GET,
                     entity,
-                    Boolean.class
+                    new ParameterizedTypeReference<>() {
+                    }
             );
 
-            return CustomResponse.success(responseValid.getBody());
+            return responseValid.getBody();
         } catch (RestClientException e) {
-            throw new RuntimeException("Errore di comunicazione = " + e.getMessage());
+            return CustomResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
     }
 }

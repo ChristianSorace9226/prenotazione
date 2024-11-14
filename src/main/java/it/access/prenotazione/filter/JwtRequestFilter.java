@@ -36,13 +36,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 Boolean isValid = isValidCall.getResponse();
                 String isValidError = isValidCall.getErrorMessage();
 
-                if (Boolean.TRUE.equals(isValid)) {
-                    chain.doFilter(request, response);
-                } else {
+                if (!isValidError.isEmpty()){
+                    log.error("Token non valido: {}", isValidError);
                     response.setStatus(isValidResult);
                     response.getWriter().write(isValidError);
+                    return;
                 }
-
+                if (Boolean.TRUE.equals(isValid)) {
+                    chain.doFilter(request, response);
+                }
             } catch (RuntimeException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write(e.getMessage());

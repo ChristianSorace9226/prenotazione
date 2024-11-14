@@ -1,7 +1,6 @@
 package it.access.prenotazione.service.resource;
 
 import it.access.prenotazione.dto.PrenotazioneDTO;
-import jakarta.servlet.ServletException;
 
 import java.util.List;
 

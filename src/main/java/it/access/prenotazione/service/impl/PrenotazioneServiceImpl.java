@@ -2,13 +2,19 @@ package it.access.prenotazione.service.impl;
 
 import it.access.prenotazione.config.AppValue;
 import it.access.prenotazione.dto.PrenotazioneDTO;
+import it.access.prenotazione.exception.InvalidCodeException;
 import it.access.prenotazione.mapper.PrenotazioneMapper;
 import it.access.prenotazione.model.entity.Prenotazione;
 import it.access.prenotazione.model.repository.PrenotazioneRepository;
+import it.access.prenotazione.response.CustomResponse;
 import it.access.prenotazione.service.resource.PrenotazioneServiceResource;
 import it.access.prenotazione.util.PrenotazioneUtil;
+import jakarta.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -39,30 +45,43 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
     @Transactional
     @Override
     public String prenota(PrenotazioneDTO request, String token) {
-        String codicePrenotazione = prenotazioneUtil.createPrenotazione(request, token);
-        if (codicePrenotazione != null) {
-            Prenotazione nuovaPrenotazione = prenotazioneRepository.findByCodice(codicePrenotazione)
-                    .orElseThrow(() -> new RuntimeException("Prenotazione non riuscita"));
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(appValue.getSaveCodPrenotazioneIntoUser())
-                    .queryParam("userId", nuovaPrenotazione.getUserId())
-                    .queryParam("codice", codicePrenotazione);
-            Boolean codeSaved = restTemplate.getForObject(builder.toUriString(), Boolean.class);
+        CustomResponse<String> codicePrenotazione = prenotazioneUtil.createPrenotazione(request, token);
 
-            if (Boolean.TRUE.equals(codeSaved)) {
-                return "Prenotazione avvenuta con successo con codice: " + nuovaPrenotazione.getCodice();
-            } else {
-                return "Ops... Qualcosa è andato storto";
-            }
+        if (!codicePrenotazione.getErrorMessage().isEmpty()) {
+            throw new RuntimeException(codicePrenotazione.getErrorMessage());
         }
-        return "Prenotazione non possibile: codice già in uso.";
+        Prenotazione nuovaPrenotazione = prenotazioneRepository.findByCodice(codicePrenotazione.getResponse())
+                .orElseThrow(() -> new RuntimeException("Prenotazione non riuscita"));
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(appValue.getSaveCodPrenotazioneIntoUser())
+                .queryParam("userId", nuovaPrenotazione.getUserId())
+                .queryParam("codice", codicePrenotazione.getResponse());
+        CustomResponse<Boolean> codeSaved;
 
+        ResponseEntity<CustomResponse<Boolean>> codeSavedCall = restTemplate.exchange(builder.toUriString(),
+                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
+        codeSaved = codeSavedCall.getBody();
+
+        int codeSavedResult = codeSaved.getResult();
+        Boolean codeSavedResponse = codeSaved.getResponse();
+        String errorMessage = codeSaved.getErrorMessage();
+
+        if (!errorMessage.isEmpty()) {
+            throw new RuntimeException(errorMessage);
+        }
+
+        if (Boolean.TRUE.equals(codeSavedResponse)) {
+            return "Prenotazione avvenuta: " + codicePrenotazione.getResponse();
+        } else {
+            throw new RuntimeException(errorMessage);
+        }
     }
 
     @Transactional
     @Override
     public PrenotazioneDTO modificaPrenotazione(String codice, PrenotazioneDTO prenotazione) {
         Prenotazione prenotazioneEntity = prenotazioneRepository.findByCodice(codice)
-                .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto"));
+                .orElseThrow(() -> new InvalidCodeException("Codice non trovato o non corretto"));
         if (prenotazione.getCodice() != null) {
             prenotazioneEntity.setCodice(prenotazione.getCodice());
         }
@@ -74,7 +93,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
     @Override
     public PrenotazioneDTO getPrenotazione(String codice) {
         Prenotazione prenotazione = prenotazioneRepository.findByCodice(codice)
-                .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto"));
+                .orElseThrow(() -> new InvalidCodeException("Codice non trovato o non corretto"));
         return prenotazioneMapper.toDto(prenotazione);
     }
 
@@ -82,7 +101,7 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
     @Override
     public String cancellaPrenotazione(String codice) {
         Prenotazione prenotzione = prenotazioneRepository.findByCodice(codice)
-                .orElseThrow(() -> new RuntimeException("Codice non trovato o non corretto."));
+                .orElseThrow(() -> new InvalidCodeException("Codice non trovato o non corretto."));
         prenotazioneRepository.deleteByCodice(codice);
         return "Prenotazione cancellata correttamente.";
     }
@@ -90,8 +109,8 @@ public class PrenotazioneServiceImpl implements PrenotazioneServiceResource {
     @Override
     public List<PrenotazioneDTO> getAllPrenotazioni() {
         List<Prenotazione> prenotazioni = prenotazioneRepository.findAll();
-        if (prenotazioni.isEmpty()){
-            throw new RuntimeException("Nessuna prenotazione trovata.");
+        if (prenotazioni.isEmpty()) {
+            throw new NoResultException("Nessuna prenotazione trovata.");
         }
         return prenotazioneMapper.toDtoList(prenotazioni);
     }
