@@ -7,19 +7,16 @@ import it.access.prenotazione.mapper.PrenotazioneMapper;
 import it.access.prenotazione.model.entity.Prenotazione;
 import it.access.prenotazione.model.repository.PrenotazioneRepository;
 import it.access.prenotazione.response.CustomResponse;
-import jakarta.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -52,7 +49,8 @@ public class PrenotazioneUtil {
                     appValue.getGetUserId() + token,
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<>() {}
+                    new ParameterizedTypeReference<>() {
+                    }
             );
             userId = responseEntity.getBody();
         } catch (RestClientException e) {
